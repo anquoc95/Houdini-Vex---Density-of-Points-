@@ -175,4 +175,4 @@ int inverse(int N; float a,b; float input[],output[])
 float @finverse[];
 inverse(N,@a,@b,@fdist,@finverse);
 
-S
+
