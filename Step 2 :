@@ -1,7 +1,7 @@
 // Input 0 : Points to Ramp
 // Input 1 : Line , curve
 // Input 2 : output of step 1 
-
+// Run over in Points . 
 
 float evalarray(float x; float a,b;float w[])
 {
