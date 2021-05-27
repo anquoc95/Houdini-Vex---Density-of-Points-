@@ -1,3 +1,9 @@
+// Credit : https://www.sidefx.com/forum
+
+
+// Step 1 : Create an attribute wrangle and run in detail 
+// Connect input 0 in line : 
+
 vector Deri(float u; int id)
 {
     float eps = 1e-2;
