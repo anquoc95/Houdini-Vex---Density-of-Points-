@@ -1,0 +1,28 @@
+// Input 0 : Points to Ramp
+// Input 1 : Line , curve
+// Input 2 : output of step 1 
+
+
+float evalarray(float x; float a,b;float w[])
+{
+    int n = len(w);
+    if(x >= b)
+    {
+        return w[n -1];
+     }
+     float r = (x - a)/ (b - a) * n;
+     int np,mp;
+     np = floor(r);
+     float lambda = r - np;
+     mp = min(np + 1,n-1);
+     return lerp(w[np],w[mp],lambda);
+}
+float u = float(@ptnum) / (@numpt - 1);
+float a;
+float b;
+float w[];
+a = detail(2, "a");
+b = detail(2, "b");
+w = detail(2, "finverse");
+float s = evalarray(u,a,b,w);
+@P = primuv(1,"P",0,s);
