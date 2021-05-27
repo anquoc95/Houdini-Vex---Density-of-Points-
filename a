@@ -1,0 +1,172 @@
+vector Deri(float u; int id)
+{
+    float eps = 1e-2;
+    vector Q;
+    float ume, upe;
+    ume = clamp(u - eps, 0, 1);
+    upe = clamp(u + eps, 0 ,1);
+    vector A,B,C;
+    A = primuv(1, "P", 0, ume);
+    B = primuv(1, "P", 0, u);
+    C = primuv(1, "P", 0, upe);
+    if(id==1)
+    {
+        Q = (C-A)/(2*eps);
+    }
+    else
+    {
+        Q = (C - 2*B + A) / (4 * eps*eps);
+    }
+    return Q;
+    
+}
+
+ 
+
+// Density function ( for example given by ramp)
+// the density should be > 0 everywhere
+
+ 
+
+float density(float x)
+{
+    float r = chramp("density",x);
+    return r;
+}
+
+ 
+
+float integral(float a,b)
+{
+    int n = 100;
+    float r = 0;
+    float xi, xim1, xc;
+    float fi, fim1, fxc;
+    float d = (b-a)/(n-1);
+    xim1 = a;
+    fim1 = density(xim1);
+    for(int i = 1; i < n ; i++)
+    {
+        xi = a + d * i;
+        xc = (xi + xim1) / 2;
+        fi = density(xi);
+        fxc = density(xc);
+        r += (xi - xim1) / 6 * (fim1 + 4*fxc +fi);
+        xim1 = xi;
+        fim1 = fi;
+      }
+      return r;
+      
+}
+
+ 
+
+float dist(float x)
+{
+    float r;
+    float a = 0;
+    float b = 1;
+    r = integral(a,x) / integral(a,b);
+    return r;
+}
+
+ 
+
+int getdistarray(int N; float a,b; float output[])
+{
+    float x ;
+    for(int i=0;i<N;i++)
+    {
+        x = a + i * (b - a) / (N - 1);
+        push(output,dist(x));
+    }
+    return 0;
+}
+
+ 
+
+
+float @fdist [];
+int N = chi("number");
+float @a = 0;
+float @b = 1;
+getdistarray(N, @a, @b, @fdist);
+
+ 
+
+// function to use an array to interpolate values
+// function is support to on [ a ,b ]
+// every array elements represents evaluation of
+// the corresponding x - value (equidisttant)
+
+ 
+
+
+float evalarray(float x ; float a,b;float w[])
+{
+
+ 
+
+    int n = len(w);
+    if( x>=b)
+    {
+        return w[n-1];
+    }
+    float r = (x - a)/ (b - a) * n;
+    int np, mp;
+    np = floor(r);
+    float lambda = r - np;
+    mp = min(np + 1, n-1);
+    return lerp(w[np],w[mp], lambda);
+}
+
+ 
+
+
+float besecarray(float p; float a,b; float w[])
+{
+    float x,y,xc;
+    float fx,fy,fxc;
+    float eps = chf("eps");
+    x = a;
+    y = b;
+    fx = evalarray(x,a,b,w);
+    fy = evalarray(y,a,b,w);
+    float r = x;
+    while(abs(x - y)> eps)
+    {
+        xc = (x + y) / 2;
+        fxc = evalarray(xc,a,b,w);
+        if(fxc < p)
+        {
+            x = xc;
+        } else
+        if (fxc>p)
+        {
+            y = xc;
+         } else
+         {
+            r = xc;
+            return r;
+         }
+    }
+    r = xc;
+    return r;
+}
+
+ 
+
+int inverse(int N; float a,b; float input[],output[])
+{
+    float x ;
+    for(int i = 0; i<N; i++)
+    {
+        x = a + i * (b - a) / (N - 1);
+        push(output, besecarray(x,a,b,input));
+     }
+     return 0;
+ }
+float @finverse[];
+inverse(N,@a,@b,@fdist,@finverse);
+
+ 
